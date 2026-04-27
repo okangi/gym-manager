@@ -1,0 +1,324 @@
+/* ============================================
+   RESPONSIVE STYLES FOR GYM MANAGEMENT APP
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* ========== MAIN CONTENT (COMMON) ========== */
+@media (max-width: 768px) {
+  .member-main,
+  .admin-main,
+  .trainer-main {
+    padding: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    flex: none !important;
+    display: block !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  /* Remove top margin from first heading inside main */
+  .member-main h2:first-child,
+  .member-main h1:first-child,
+  .admin-main h2:first-child,
+  .admin-main h1:first-child,
+  .trainer-main h2:first-child,
+  .trainer-main h1:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* All direct children of main fill width */
+  .member-main > div,
+  .admin-main > div,
+  .trainer-main > div {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* ========== STATISTICS CARDS (STACK ON MOBILE) ========== */
+@media (max-width: 768px) {
+  .stats-container {
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+
+  .stat-card {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 16px !important;
+  }
+}
+
+/* ========== USER INFO, PROFILE, CARDS ========== */
+@media (max-width: 768px) {
+  .user-info,
+  .card,
+  .profile-settings,
+  .password-form-container {
+    width: 100% !important;
+    padding: 16px !important;
+    box-sizing: border-box;
+  }
+}
+
+/* ========== BUTTONS – PREVENT FULL WIDTH ON MOBILE ========== */
+@media (max-width: 768px) {
+  button,
+  .btn,
+  .logoutButton,
+  .themeButton,
+  .changePasswordButton,
+  .exportButton,
+  .editButton,
+  .saveButton,
+  .cancelButton,
+  .avatarButton,
+  .adminButton {
+    width: auto !important;
+    min-width: auto !important;
+    display: inline-block !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    margin: 4px !important;
+  }
+}
+
+/* ========== NAVBAR RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .navbar .container {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .navbar-nav {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    width: auto;
+    gap: 8px;
+  }
+
+  .navbar .btn {
+    width: auto !important;
+    padding: 4px 8px !important;
+    margin: 4px 4px !important;
+  }
+
+  .navbar-collapse {
+    text-align: center;
+  }
+}
+
+/* ========== EXTRA SMALL DEVICES (PHONES) ========== */
+@media (max-width: 480px) {
+  button,
+  .btn {
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+  }
+
+  .member-main,
+  .admin-main,
+  .trainer-main {
+    padding: 8px !important;
+  }
+}
+
+/* ========== ADMIN & TRAINER LAYOUTS ========== */
+@media (max-width: 768px) {
+  .admin-layout,
+  .trainer-layout {
+    flex-direction: column !important;
+  }
+
+  .admin-sidebar,
+  .trainer-sidebar {
+    width: 100% !important;
+    position: static !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-color, #ddd);
+    padding: 10px !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 8px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow-y: visible !important;
+  }
+
+  .admin-sidebar ul,
+  .trainer-sidebar ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+  }
+
+  .admin-sidebar li,
+  .trainer-sidebar li {
+    margin: 0 !important;
+  }
+
+  .admin-sidebar a,
+  .trainer-sidebar a {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    white-space: nowrap;
+  }
+
+  .admin-main,
+  .trainer-main {
+    padding: 12px !important;
+    width: 100% !important;
+    padding-top: 0 !important;
+  }
+
+  .admin-main h2:first-child,
+  .trainer-main h2:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+}
+
+/* ========== HYBRID LAYOUT: SIDEBAR ON DESKTOP, HAMBURGER ON MOBILE ========== */
+/* Default: hide hamburger button on desktop, show desktop sidebar */
+.hamburger-btn {
+  display: none !important;
+}
+
+.desktop-sidebar {
+  display: block !important;
+}
+
+/* Hide offcanvas by default */
+.mobile-offcanvas {
+  display: none;
+}
+
+/* On mobile: hide desktop sidebar, show hamburger button, style offcanvas */
+@media (max-width: 768px) {
+  .desktop-sidebar {
+    display: none !important;
+  }
+  
+  .hamburger-btn {
+    display: inline-block !important;
+  }
+  
+  .mobile-offcanvas {
+    display: block !important;
+  }
+}
+
+/* Ensure offcanvas doesn't show on desktop */
+@media (min-width: 769px) {
+  .mobile-offcanvas {
+    display: none !important;
+  }
+  
+  .hamburger-btn {
+    display: none !important;
+  }
+  
+  .desktop-sidebar {
+    display: block !important;
+  }
+}
+
+/* ========== TABLES RESPONSIVE ========== */
+@media (max-width: 768px) {
+  table {
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 6px 8px !important;
+  }
+  
+  /* Make tables horizontally scrollable on mobile */
+  .table-responsive {
+    overflow-x: auto;
+    display: block;
+    width: 100%;
+  }
+}
+
+/* ========== MODALS RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 10px !important;
+    max-width: calc(100% - 20px) !important;
+  }
+  
+  .modal-body {
+    padding: 12px !important;
+  }
+  
+  .modal-footer {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .modal-footer button {
+    margin: 4px !important;
+  }
+}
+
+/* ========== FORMS RESPONSIVE ========== */
+@media (max-width: 768px) {
+  form {
+    width: 100%;
+  }
+  
+  input, select, textarea {
+    font-size: 14px !important; /* Prevents zoom on iOS */
+  }
+  
+  .form-group {
+    margin-bottom: 12px;
+  }
+}
+
+/* ========== GRID RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .grid-2, 
+  .grid-3, 
+  .grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ========== CHAT RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .chat-container {
+    flex-direction: column !important;
+  }
+  
+  .chat-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-color, #ddd);
+  }
+  
+  .chat-area {
+    height: 500px !important;
+  }
+}

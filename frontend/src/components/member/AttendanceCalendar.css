@@ -1,0 +1,64 @@
+/* Light mode default */
+.light-calendar {
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Dark mode overrides */
+.dark-calendar {
+  background-color: #1e2a3a;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 8px;
+}
+
+.dark-calendar .react-calendar__navigation button {
+  color: #eee;
+}
+
+.dark-calendar .react-calendar__navigation button:enabled:hover,
+.dark-calendar .react-calendar__navigation button:enabled:focus {
+  background-color: #0f3460;
+}
+
+.dark-calendar .react-calendar__month-view__weekdays {
+  color: #ccc;
+}
+
+.dark-calendar .react-calendar__month-view__weekdays abbr {
+  text-decoration: none;
+  color: #ccc;
+}
+
+.dark-calendar .react-calendar__tile {
+  background-color: #1e2a3a;
+  color: #eee;
+}
+
+.dark-calendar .react-calendar__tile:enabled:hover,
+.dark-calendar .react-calendar__tile:enabled:focus {
+  background-color: #0f3460;
+}
+
+.dark-calendar .react-calendar__tile--now {
+  background-color: #2a4a6e;
+}
+
+.dark-calendar .react-calendar__tile--active {
+  background-color: #1877f2;
+  color: white;
+}
+
+/* Check-in dot */
+.checkin-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #4caf50;
+  border-radius: 50%;
+  margin: 4px auto 0;
+}
+
+.dark-calendar .checkin-dot {
+  background-color: #4caf50;
+}

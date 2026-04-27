@@ -1,0 +1,398 @@
+/* ============================================
+   GLOBAL THEME VARIABLES
+   ============================================ */
+
+/* Light mode (default) */
+:root {
+  --bg-body: #8fa2b6;
+  --card-bg: #dddde0;
+  --text-primary: #1e2a3a;
+  --text-secondary: #4a5568;
+  --border-color: #e2e8f0;
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.02);
+  --accent: #1877f2;
+  --accent-hover: #0e5fd9;
+  --hover-bg: #f0f2f5;
+  --success: #4caf50;
+  --warning: #ff9800;
+  --danger: #dc3545;
+  --info: #17a2b8;
+}
+
+/* Dark mode overrides */
+body.dark-mode {
+  --bg-body: #1a1a2e;
+  --card-bg: #16213e;
+  --text-primary: #eee;
+  --text-secondary: #ccc;
+  --border-color: #444;
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  --accent: #4caf50;
+  --accent-hover: #45a049;
+  --hover-bg: #0f3460;
+  --success: #4caf50;
+  --warning: #ff9800;
+  --danger: #f44336;
+  --info: #2196f3;
+}
+
+/* Apply body background */
+body {
+  background-color: var(--bg-body);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  margin: 0;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+/* ========== SCROLLBAR STYLES ========== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
+}
+
+/* ========== CARD & CONTAINER STYLES ========== */
+.card,
+.stat-card,
+.user-info,
+.membershipCard,
+.planCard,
+.referral-card,
+.member-sidebar,
+.admin-sidebar,
+.trainer-sidebar,
+.dashboard-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover,
+.stat-card:hover,
+.planCard:hover,
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* ========== BUTTONS ========== */
+.btn-primary,
+button[style*="backgroundColor: #1877f2"] {
+  background-color: var(--accent) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 8px 20px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover,
+button[style*="backgroundColor: #1877f2"]:hover {
+  background-color: var(--accent-hover) !important;
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-danger {
+  background-color: var(--danger) !important;
+}
+
+.btn-success {
+  background-color: var(--success) !important;
+}
+
+.btn-warning {
+  background-color: var(--warning) !important;
+}
+
+/* ========== TABLES ========== */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+th {
+  background-color: var(--hover-bg);
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 12px;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+/* ========== SIDEBAR LINKS ========== */
+.member-sidebar a,
+.admin-sidebar a,
+.trainer-sidebar a {
+  color: var(--text-primary);
+  text-decoration: none;
+  display: block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.member-sidebar a:hover,
+.admin-sidebar a:hover,
+.trainer-sidebar a:hover {
+  background-color: var(--hover-bg);
+}
+
+.member-sidebar a.active,
+.admin-sidebar a.active,
+.trainer-sidebar a.active {
+  background-color: var(--accent);
+  color: white;
+}
+
+/* ========== NAVBAR ========== */
+.navbar {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.navbar-light {
+  background-color: var(--card-bg) !important;
+}
+
+.navbar-dark {
+  background-color: #1a1a2e !important;
+}
+
+/* ========== TYPOGRAPHY ========== */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* ========== FORMS ========== */
+input, textarea, select {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
+}
+
+/* ========== ALERTS ========== */
+.alert-success {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.1);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.alert-warning {
+  background-color: rgba(255, 152, 0, 0.1);
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.alert-info {
+  background-color: rgba(23, 162, 184, 0.1);
+  border-color: var(--info);
+  color: var(--info);
+}
+
+/* ========== MODALS ========== */
+.modal-content {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+.modal-header {
+  border-bottom-color: var(--border-color);
+}
+
+.modal-footer {
+  border-top-color: var(--border-color);
+}
+
+/* ========== DARK MODE SPECIFIC FIXES ========== */
+body.dark-mode label,
+body.dark-mode .form-label,
+body.dark-mode .navbar-nav .nav-link,
+body.dark-mode .member-sidebar a,
+body.dark-mode .admin-sidebar a,
+body.dark-mode .trainer-sidebar a,
+body.dark-mode .offcanvas .nav-link,
+body.dark-mode .offcanvas .offcanvas-title {
+  color: #eee !important;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+  background-color: #1e2a3a !important;
+  border-color: #555 !important;
+  color: #eee !important;
+}
+
+body.dark-mode .form-control::placeholder {
+  color: #aaa !important;
+}
+
+body.dark-mode .offcanvas {
+  background-color: #1e2a3a !important;
+}
+
+body.dark-mode .offcanvas .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%) !important;
+  opacity: 1 !important;
+}
+
+/* ========== ADMIN STAT CARDS DARK MODE ========== */
+body.dark-mode .admin-stat-card {
+  background-color: #0f3460 !important;
+  border: 1px solid #2a4a6e !important;
+  border-radius: 8px !important;
+  padding: 20px !important;
+  text-align: center !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+}
+
+body.dark-mode .admin-stat-card h3,
+body.dark-mode .admin-stat-card p {
+  color: #fff !important;
+}
+
+body.dark-mode .filterLabel,
+body.dark-mode .welcome {
+  color: #ddd !important;
+}
+
+body.dark-mode select {
+  background-color: #0f3460 !important;
+  color: #eee !important;
+  border-color: #555 !important;
+}
+
+body.dark-mode .admin-dashboard-card {
+  background-color: #0f3460 !important;
+  border: 1px solid #2a4a6e !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3) !important;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+/* Mobile devices */
+@media (max-width: 768px) {
+  .landing-hero-title {
+    font-size: 2rem !important;
+  }
+  
+  .landing-features-grid,
+  .landing-gallery-grid,
+  .landing-video-grid {
+    gap: 15px !important;
+  }
+  
+  table {
+    font-size: 14px;
+  }
+  
+  th, td {
+    padding: 8px;
+  }
+  
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  
+  .card {
+    margin: 10px;
+  }
+}
+
+/* Tablet devices */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .landing-hero-title {
+    font-size: 3rem !important;
+  }
+}
+
+/* ========== UTILITY CLASSES ========== */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mt-4 { margin-top: 1.5rem; }
+.mt-5 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 1rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mb-5 { margin-bottom: 2rem; }
+
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 1rem; }
+.p-4 { padding: 1.5rem; }
+.p-5 { padding: 2rem; }
+
+/* Animation for loading states */
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.loading-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
