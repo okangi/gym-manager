@@ -198,8 +198,7 @@ function ManagePayments() {
     },
     table: { 
       width: '100%', 
-      borderCollapse: 'collapse',
-      minWidth: '700px'
+      borderCollapse: 'collapse'
     },
     th: {
       textAlign: 'left',
@@ -280,7 +279,7 @@ function ManagePayments() {
       ) : (
         <>
           <div style={styles.tableWrapper}>
-            <table style={styles.table}>
+            <table className="responsive-table" style={styles.table}>
               <thead>
                 <tr>
                   <th style={styles.th}>Date</th>
@@ -295,8 +294,8 @@ function ManagePayments() {
               <tbody>
                 {payments.map(payment => (
                   <tr key={payment.id}>
-                    <td style={styles.td}>{formatDate(payment.createdAt || payment.paymentDate)}</td>
-                    <td style={styles.td}>
+                    <td data-label="Date" style={styles.td}>{formatDate(payment.createdAt || payment.paymentDate)}</td>
+                    <td data-label="User" style={styles.td}>
                       <strong>{payment.userName}</strong>
                       {payment.userEmail !== 'N/A' && (
                         <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
@@ -304,12 +303,12 @@ function ManagePayments() {
                         </div>
                       )}
                     </td>
-                    <td style={styles.td}>{payment.planName}</td>
-                    <td style={styles.td}>
+                    <td data-label="Plan" style={styles.td}>{payment.planName}</td>
+                    <td data-label="Amount" style={styles.td}>
                       <strong>{currency}{payment.amount.toLocaleString()}</strong>
                     </td>
-                    <td style={styles.td}>{payment.paymentMethod}</td>
-                    <td style={styles.td}>
+                    <td data-label="Payment Method" style={styles.td}>{payment.paymentMethod}</td>
+                    <td data-label="Status" style={styles.td}>
                       <span style={{
                         ...styles.statusBadge,
                         ...getStatusBadgeStyle(payment.status)
@@ -317,7 +316,7 @@ function ManagePayments() {
                         {payment.status}
                       </span>
                     </td>
-                    <td style={styles.td}>{getBranchName(payment.branchId)}</td>
+                    <td data-label="Branch" style={styles.td}>{getBranchName(payment.branchId)}</td>
                   </tr>
                 ))}
               </tbody>

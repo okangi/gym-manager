@@ -122,7 +122,7 @@ function BranchAssignment() {
       if (failCount > 0) {
         setError(`⚠️ Failed to assign ${failCount} user(s).`);
       }
-      await loadData(); // Refresh the list
+      await loadData();
       setSelectedUsers([]);
       setSelectedBranch('');
     } else {
@@ -195,11 +195,12 @@ function BranchAssignment() {
       cursor: 'pointer',
       fontWeight: 'bold'
     },
+    tableWrapper: {
+      overflowX: 'auto'
+    },
     table: {
       width: '100%',
-      borderCollapse: 'collapse',
-      overflowX: 'auto',
-      display: 'block'
+      borderCollapse: 'collapse'
     },
     th: {
       textAlign: 'left',
@@ -262,7 +263,7 @@ function BranchAssignment() {
   if (loading) {
     return (
       <div style={styles.container}>
-        <h2 style={styles.title}>Branch Assignment</h2>
+        <h2 style={styles.title}>🏢 Branch Assignment</h2>
         <div style={styles.loadingContainer}>
           <Spinner animation="border" variant="primary" />
           <p>Loading users and branches...</p>
@@ -333,8 +334,8 @@ function BranchAssignment() {
         </select>
       </div>
       
-      <div style={{ overflowX: 'auto' }}>
-        <table style={styles.table}>
+      <div style={styles.tableWrapper}>
+        <table className="responsive-table" style={styles.table}>
           <thead>
             <tr>
               <th style={styles.th}>
@@ -360,7 +361,7 @@ function BranchAssignment() {
               
               return (
                 <tr key={userId}>
-                  <td style={styles.td}>
+                  <td data-label="Select" style={styles.td}>
                     <input
                       type="checkbox"
                       checked={isSelected}
@@ -368,18 +369,18 @@ function BranchAssignment() {
                       style={styles.checkbox}
                     />
                   </td>
-                  <td style={styles.td}>
+                  <td data-label="Name" style={styles.td}>
                     <strong>{user.name || 'N/A'}</strong>
                   </td>
-                  <td style={styles.td}>{user.email}</td>
-                  <td style={styles.td}>
+                  <td data-label="Email" style={styles.td}>{user.email}</td>
+                  <td data-label="Role" style={styles.td}>
                     <span style={{
                       color: user.role === 'admin' ? '#ff9800' : user.role === 'trainer' ? '#4caf50' : '#1877f2'
                     }}>
                       {user.role || 'member'}
                     </span>
                   </td>
-                  <td style={styles.td}>
+                  <td data-label="Current Branch" style={styles.td}>
                     <span style={{
                       ...styles.branchBadge,
                       ...(!user.branchId && styles.unassignedBadge)
@@ -387,7 +388,7 @@ function BranchAssignment() {
                       {branchName}
                     </span>
                   </td>
-                  <td style={styles.td}>{user.phone || '—'}</td>
+                  <td data-label="Phone" style={styles.td}>{user.phone || '—'}</td>
                 </tr>
               );
             })}

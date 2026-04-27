@@ -154,8 +154,7 @@ function ContactMessages() {
     },
     table: {
       width: '100%',
-      borderCollapse: 'collapse',
-      minWidth: '700px'
+      borderCollapse: 'collapse'
     },
     th: {
       textAlign: 'left',
@@ -310,7 +309,7 @@ function ContactMessages() {
         </div>
       ) : (
         <div style={styles.tableWrapper}>
-          <table style={styles.table}>
+          <table className="responsive-table" style={styles.table}>
             <thead>
               <tr>
                 <th style={styles.th}>Name</th>
@@ -328,18 +327,18 @@ function ContactMessages() {
                 const isUnread = msg.status === 'new' || msg.status === 'Unread';
                 return (
                   <tr key={msg._id || msg.id} style={isUnread ? styles.unreadRow : {}}>
-                    <td style={styles.td}>
+                    <td data-label="Name" style={styles.td}>
                       <strong>{msg.name}</strong>
                     </td>
-                    <td style={styles.td}>{msg.email}</td>
-                    <td style={styles.td}>{msg.phone || '—'}</td>
-                    <td style={styles.td}>{msg.subject}</td>
-                    <td style={{ ...styles.td, ...styles.messageCell }}>
+                    <td data-label="Email" style={styles.td}>{msg.email}</td>
+                    <td data-label="Phone" style={styles.td}>{msg.phone || '—'}</td>
+                    <td data-label="Subject" style={styles.td}>{msg.subject}</td>
+                    <td data-label="Message" style={{ ...styles.td, ...styles.messageCell }}>
                       <div style={styles.messageText}>
                         {msg.message.length > 100 ? msg.message.substring(0, 100) + '...' : msg.message}
                       </div>
                     </td>
-                    <td style={styles.td}>
+                    <td data-label="Status" style={styles.td}>
                       <span style={{
                         ...styles.statusBadge,
                         ...getStatusBadgeStyle(msg.status)
@@ -347,8 +346,8 @@ function ContactMessages() {
                         {msg.status === 'new' ? 'Unread' : msg.status}
                       </span>
                     </td>
-                    <td style={styles.td}>{new Date(msg.createdAt).toLocaleString()}</td>
-                    <td style={styles.td}>
+                    <td data-label="Date" style={styles.td}>{new Date(msg.createdAt).toLocaleString()}</td>
+                    <td data-label="Actions" style={styles.td}>
                       <div style={styles.actions}>
                         {isUnread && (
                           <button

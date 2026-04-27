@@ -10,7 +10,7 @@ function PaymentsHistory() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [currencySymbol, setCurrencySymbol] = useState('$'); // Add state for currency
+  const [currencySymbol, setCurrencySymbol] = useState('$');
 
   // Load currency symbol
   useEffect(() => {
@@ -86,11 +86,12 @@ function PaymentsHistory() {
       color: 'var(--text-primary)',
       marginBottom: '16px'
     },
+    tableWrapper: {
+      overflowX: 'auto'
+    },
     table: {
       width: '100%',
-      borderCollapse: 'collapse',
-      overflowX: 'auto',
-      display: 'block'
+      borderCollapse: 'collapse'
     },
     th: {
       textAlign: 'left',
@@ -145,8 +146,8 @@ function PaymentsHistory() {
       {payments.length === 0 ? (
         <p style={styles.empty}>No payments recorded yet.</p>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={styles.table}>
+        <div style={styles.tableWrapper}>
+          <table className="responsive-table" style={styles.table}>
             <thead>
               <tr>
                 <th style={styles.th}>Date</th>
@@ -160,16 +161,16 @@ function PaymentsHistory() {
             <tbody>
               {payments.map((payment, idx) => (
                 <tr key={payment.id || payment._id || idx}>
-                  <td style={styles.td}>{formatDate(payment.paymentDate || payment.createdAt)}</td>
-                  <td style={styles.td}>{payment.planName || 'N/A'}</td>
-                  <td style={styles.td}>{payment.type || (payment.planId ? 'Membership' : 'Payment')}</td>
-                  <td style={styles.td}>{currencySymbol}{Number(payment.amount).toLocaleString()}</td>
-                  <td style={styles.td}>
+                  <td data-label="Date" style={styles.td}>{formatDate(payment.paymentDate || payment.createdAt)}</td>
+                  <td data-label="Plan" style={styles.td}>{payment.planName || 'N/A'}</td>
+                  <td data-label="Type" style={styles.td}>{payment.type || (payment.planId ? 'Membership' : 'Payment')}</td>
+                  <td data-label="Amount" style={styles.td}>{currencySymbol}{Number(payment.amount).toLocaleString()}</td>
+                  <td data-label="Status" style={styles.td}>
                     <span style={{ color: getStatusColor(payment.status) }}>
                       {getStatusIcon(payment.status)} {payment.status || 'Completed'}
                     </span>
                   </td>
-                  <td style={styles.td}>
+                  <td data-label="Transaction ID" style={styles.td}>
                     <span style={{ fontSize: '11px', fontFamily: 'monospace' }}>
                       {payment.transactionId || 'N/A'}
                     </span>

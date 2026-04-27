@@ -71,7 +71,6 @@ function UserList() {
         await deleteUser(userToDelete.id || userToDelete._id, token);
         await addActivityLog(currentUser?.email, 'Delete User', `Deleted user ${userToDelete.email}`, token);
         await loadUsers();
-        // Clear selection after delete
         setSelectedUsers([]);
         setSelectAll(false);
         alert('User deleted successfully.');
@@ -103,7 +102,6 @@ function UserList() {
     }
   };
 
-  // Handle select all checkbox
   const handleSelectAll = () => {
     if (selectAll) {
       setSelectedUsers([]);
@@ -115,7 +113,6 @@ function UserList() {
     }
   };
 
-  // Handle individual user selection
   const handleSelectUser = (userId) => {
     if (selectedUsers.includes(userId)) {
       setSelectedUsers(selectedUsers.filter(id => id !== userId));
@@ -128,7 +125,6 @@ function UserList() {
     }
   };
 
-  // Handle bulk assignment
   const handleBulkAssign = async () => {
     if (!bulkBrancnhId || selectedUsers.length === 0) return;
     
@@ -175,8 +171,7 @@ function UserList() {
       marginTop: '24px',
       padding: '16px',
       backgroundColor: 'var(--card-bg)',
-      borderRadius: '8px',
-      overflowX: 'auto'
+      borderRadius: '8px'
     },
     title: {
       marginTop: 0,
@@ -202,14 +197,12 @@ function UserList() {
       marginLeft: 'auto',
       fontSize: '14px'
     },
-    bulkButtonDisabled: {
-      opacity: 0.6,
-      cursor: 'not-allowed'
+    tableWrapper: {
+      overflowX: 'auto'
     },
     table: {
       width: '100%',
-      borderCollapse: 'collapse',
-      minWidth: '700px'
+      borderCollapse: 'collapse'
     },
     th: {
       textAlign: 'left',
@@ -293,72 +286,74 @@ function UserList() {
       {filteredUsers.length === 0 ? (
         <p style={{ color: theme === 'dark' ? '#aaa' : '#666' }}>No users found for this branch.</p>
       ) : (
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>
-                <input
-                  type="checkbox"
-                  checked={selectAll && filteredUsers.length > 0}
-                  onChange={handleSelectAll}
-                  style={styles.checkbox}
-                />
-              </th>
-              <th style={styles.th}>Name</th>
-              <th style={styles.th}>Email</th>
-              <th style={styles.th}>Phone</th>
-              <th style={styles.th}>Branch</th>
-              <th style={styles.th}>Login Count</th>
-              <th style={styles.th}>Last Login</th>
-              <th style={styles.th}>Joined</th>
-              <th style={styles.th}>Role</th>
-              <th style={styles.th}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map(user => {
-              const userId = user.id || user._id;
-              return (
-                <tr key={userId}>
-                  <td style={styles.td}>
-                    <input
-                      type="checkbox"
-                      checked={selectedUsers.includes(userId)}
-                      onChange={() => handleSelectUser(userId)}
-                      style={styles.checkbox}
-                    />
-                  </td>
-                  <td style={styles.td}>{user.name || '—'}</td>
-                  <td style={styles.td}>{user.email}</td>
-                  <td style={styles.td}>{user.phone || '—'}</td>
-                  <td style={styles.td}>{getBranchName(user.branchId)}</td>
-                  <td style={styles.td}>{user.loginCount || 0}</td>
-                  <td style={styles.td}>{formatDate(user.lastLogin)}</td>
-                  <td style={styles.td}>{formatDate(user.createdAt)}</td>
-                  <td style={styles.td}>
-                    <span style={{
-                      color: user.role === 'admin' ? '#ff9800' : user.role === 'trainer' ? '#4caf50' : '#1877f2',
-                      fontWeight: 'bold'
-                    }}>
-                      {user.role || 'member'}
-                    </span>
-                  </td>
-                  <td style={styles.td}>
-                    {user.role !== 'admin' && (
-                      <>
-                        <button onClick={() => openBranchModal(user)} style={styles.branchButton}>Change Branch</button>
-                        <button onClick={() => handleDeleteUser(user)} style={styles.deleteButton}>Delete</button>
-                      </>
-                    )}
-                    {user.role === 'admin' && (
-                      <span style={{ color: '#999', fontSize: '12px' }}>Protected</span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div style={styles.tableWrapper}>
+          <table className="responsive-table" style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.th}>
+                  <input
+                    type="checkbox"
+                    checked={selectAll && filteredUsers.length > 0}
+                    onChange={handleSelectAll}
+                    style={styles.checkbox}
+                  />
+                </th>
+                <th style={styles.th}>Name</th>
+                <th style={styles.th}>Email</th>
+                <th style={styles.th}>Phone</th>
+                <th style={styles.th}>Branch</th>
+                <th style={styles.th}>Login Count</th>
+                <th style={styles.th}>Last Login</th>
+                <th style={styles.th}>Joined</th>
+                <th style={styles.th}>Role</th>
+                <th style={styles.th}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.map(user => {
+                const userId = user.id || user._id;
+                return (
+                  <tr key={userId}>
+                    <td data-label="Select" style={styles.td}>
+                      <input
+                        type="checkbox"
+                        checked={selectedUsers.includes(userId)}
+                        onChange={() => handleSelectUser(userId)}
+                        style={styles.checkbox}
+                      />
+                    </td>
+                    <td data-label="Name" style={styles.td}>{user.name || '—'}</td>
+                    <td data-label="Email" style={styles.td}>{user.email}</td>
+                    <td data-label="Phone" style={styles.td}>{user.phone || '—'}</td>
+                    <td data-label="Branch" style={styles.td}>{getBranchName(user.branchId)}</td>
+                    <td data-label="Login Count" style={styles.td}>{user.loginCount || 0}</td>
+                    <td data-label="Last Login" style={styles.td}>{formatDate(user.lastLogin)}</td>
+                    <td data-label="Joined" style={styles.td}>{formatDate(user.createdAt)}</td>
+                    <td data-label="Role" style={styles.td}>
+                      <span style={{
+                        color: user.role === 'admin' ? '#ff9800' : user.role === 'trainer' ? '#4caf50' : '#1877f2',
+                        fontWeight: 'bold'
+                      }}>
+                        {user.role || 'member'}
+                      </span>
+                    </td>
+                    <td data-label="Actions" style={styles.td}>
+                      {user.role !== 'admin' && (
+                        <>
+                          <button onClick={() => openBranchModal(user)} style={styles.branchButton}>Change Branch</button>
+                          <button onClick={() => handleDeleteUser(user)} style={styles.deleteButton}>Delete</button>
+                        </>
+                      )}
+                      {user.role === 'admin' && (
+                        <span style={{ color: '#999', fontSize: '12px' }}>Protected</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* Single User Branch Change Modal */}

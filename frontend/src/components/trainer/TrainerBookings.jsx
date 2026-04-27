@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getClasses } from '../../services/classService';
 import { getBookings } from '../../services/bookingService';
-import { getMembersByBranch } from '../../services/userService'; // Change this line
+import { getMembersByBranch } from '../../services/userService';
 
 function TrainerBookings() {
   const { user, token } = useAuth();
@@ -90,11 +90,12 @@ function TrainerBookings() {
   const styles = {
     container: { padding: '20px' },
     title: { color: 'var(--text-primary)', marginBottom: '20px' },
+    tableWrapper: {
+      overflowX: 'auto'
+    },
     table: { 
       width: '100%', 
-      borderCollapse: 'collapse',
-      overflowX: 'auto',
-      display: 'block'
+      borderCollapse: 'collapse'
     },
     th: {
       textAlign: 'left',
@@ -158,8 +159,8 @@ function TrainerBookings() {
         <p style={styles.empty}>No bookings yet for your classes.</p>
       ) : (
         <>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={styles.table}>
+          <div style={styles.tableWrapper}>
+            <table className="responsive-table" style={styles.table}>
               <thead>
                 <tr>
                   <th style={styles.th}>Class</th>
@@ -173,14 +174,14 @@ function TrainerBookings() {
               <tbody>
                 {bookings.map(b => (
                   <tr key={b.id}>
-                    <td style={styles.td}>
+                    <td data-label="Class" style={styles.td}>
                       <strong>{b.className}</strong>
                     </td>
-                    <td style={styles.td}>{b.memberName}</td>
-                    <td style={styles.td}>{b.memberEmail}</td>
-                    <td style={styles.td}>{b.memberPhone}</td>
-                    <td style={styles.td}>{formatDate(b.bookedAt)}</td>
-                    <td style={styles.td}>
+                    <td data-label="Member" style={styles.td}>{b.memberName}</td>
+                    <td data-label="Email" style={styles.td}>{b.memberEmail}</td>
+                    <td data-label="Phone" style={styles.td}>{b.memberPhone}</td>
+                    <td data-label="Booked On" style={styles.td}>{formatDate(b.bookedAt)}</td>
+                    <td data-label="Status" style={styles.td}>
                       <span style={{
                         ...styles.statusBadge,
                         backgroundColor: b.status === 'Confirmed' || b.status === 'active' ? '#4caf50' : '#ff9800',

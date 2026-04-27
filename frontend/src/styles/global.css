@@ -396,3 +396,136 @@ body.dark-mode .admin-dashboard-card {
 .loading-pulse {
   animation: pulse 1.5s ease-in-out infinite;
 }
+
+/* Responsive Table Styles - Convert tables to cards on mobile */
+@media (max-width: 768px) {
+  .responsive-table {
+    display: block;
+    width: 100%;
+  }
+  
+  .responsive-table thead {
+    display: none;
+  }
+  
+  .responsive-table tbody {
+    display: block;
+  }
+  
+  .responsive-table tr {
+    display: block;
+    margin-bottom: 16px;
+    padding: 12px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  .responsive-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    gap: 12px;
+    text-align: left;
+  }
+  
+  .responsive-table td:last-child {
+    border-bottom: none;
+  }
+  
+  .responsive-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 100px;
+    font-size: 13px;
+  }
+  
+  /* Action buttons in responsive table */
+  .responsive-table td:last-child {
+    flex-wrap: wrap;
+  }
+  
+  .responsive-table button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+/* Small phones (375px and below) */
+@media (max-width: 480px) {
+  .responsive-table td::before {
+    min-width: 80px;
+    font-size: 11px;
+  }
+  
+  .responsive-table button {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+  
+  .responsive-table td {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .responsive-table td::before {
+    margin-bottom: 4px;
+  }
+}
+
+/* Tablet Styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* General responsive improvements */
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Make modals responsive */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 8px !important;
+    width: calc(100% - 16px) !important;
+    max-width: none !important;
+  }
+  
+  .modal-body {
+    padding: 12px !important;
+  }
+}
+
+/* Make forms responsive */
+@media (max-width: 768px) {
+  input, select, textarea, button {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  .form-group {
+    margin-bottom: 12px;
+  }
+}
+
+/* Charts responsive */
+@media (max-width: 768px) {
+  .recharts-responsive-container {
+    min-height: 250px;
+  }
+  
+  .recharts-wrapper {
+    margin-left: -10px;
+  }
+}
