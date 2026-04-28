@@ -19,9 +19,8 @@
       - key: CLOUDINARY_API_SECRET
         sync: false
 
-  - type: web
+  - type: static
     name: gym-frontend
-    runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
     publishPath: dist
