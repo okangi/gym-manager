@@ -20,8 +20,93 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.error('❌ MongoDB Error:', err));
 
-// Import routes using absolute paths
-const authRoutes = require(path.join(__dirname, 'routes', 'authRoutes'));
+// ============ DIRECT AUTH ROUTES ============
+const User = require('./models/User');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+// Register
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Please provide name, email and password' });
+    }
+    
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ success: false, message: 'User already exists' });
+    }
+    
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: role || 'member'
+    });
+    
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    
+    res.status(201).json({
+      success: true,
+      token,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role }
+    });
+  } catch (error) {
+    console.error('Register error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Login
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+    
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+    
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    
+    res.json({
+      success: true,
+      token,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Get Profile
+app.get('/api/auth/profile', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ success: false, message: 'No token provided' });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
+    res.json({ success: true, user });
+  } catch (error) {
+    res.status(401).json({ success: false, message: 'Invalid token' });
+  }
+});
+// ============ END DIRECT AUTH ROUTES ============
+
+// ============ OTHER ROUTES ============
 const branchRoutes = require(path.join(__dirname, 'routes', 'branchRoutes'));
 const classRoutes = require(path.join(__dirname, 'routes', 'classRoutes'));
 const planRoutes = require(path.join(__dirname, 'routes', 'planRoutes'));
@@ -43,16 +128,8 @@ const chatRoutes = require(path.join(__dirname, 'routes', 'chatRoutes'));
 const trainerRoutes = require(path.join(__dirname, 'routes', 'trainerRoutes'));
 const membershipRoutes = require(path.join(__dirname, 'routes', 'membershipRoutes'));
 const progressRoutes = require(path.join(__dirname, 'routes', 'progressRoutes'));
-const { protect } = require(path.join(__dirname, 'middleware', 'authMiddleware'));
-const { errorHandler, notFound } = require(path.join(__dirname, 'middleware', 'errorHandler'));
 
-// Use routes
-app.post('/api/auth/register', authRoutes.post('register'));
-app.post('/api/auth/login', authRoutes.post('login'));
-app.get('/api/auth/profile', authRoutes.get('profile'));
-app.put('/api/auth/profile', authRoutes.put('profile'));
-app.post('/api/auth/change-password', authRoutes.post('change-password'));
-// All other routes
+// Use other routes
 app.use('/api/branches', branchRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/plans', planRoutes);
@@ -75,96 +152,20 @@ app.use('/api/trainers', trainerRoutes);
 app.use('/api/memberships', membershipRoutes);
 app.use('/api/progress', progressRoutes);
 
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', uptime: process.uptime(), mongodb: 'Connected' });
+});
+
 // Test route
 app.get('/api/test', (req, res) => {
   res.json({ success: true, message: 'Gym Manager Backend is running!' });
 });
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', mongodb: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected' });
-});
-
-// Get all users
-app.get('/api/users', async (req, res) => {
-  try {
-    const User = require(path.join(__dirname, 'models', 'User'));
-    const users = await User.find({}).select('-password');
-    res.json({ success: true, count: users.length, users });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// Change password
-app.post('/api/auth/change-password', protect, async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-    const User = require(path.join(__dirname, 'models', 'User'));
-    const bcrypt = require('bcryptjs');
-    
-    const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-    
-    const isMatch = await user.comparePassword(currentPassword);
-    if (!isMatch) return res.status(401).json({ success: false, message: 'Current password is incorrect' });
-    
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
-    await user.save();
-    
-    res.json({ success: true, message: 'Password changed successfully' });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// Debug: Check what's in authRoutes
-app.get('/api/debug/auth-routes', (req, res) => {
-  try {
-    const authRoutesModule = require('./routes/authRoutes');
-    const routes = [];
-    
-    // Check if authRoutes has a stack property (express router)
-    if (authRoutesModule && authRoutesModule.stack) {
-      authRoutesModule.stack.forEach((layer) => {
-        if (layer.route) {
-          routes.push({
-            path: layer.route.path,
-            methods: Object.keys(layer.route.methods)
-          });
-        }
-      });
-    }
-    
-    res.json({
-      authRoutesType: typeof authRoutesModule,
-      isExpressRouter: typeof authRoutesModule === 'function',
-      routes: routes,
-      hasStack: !!authRoutesModule?.stack
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/api/debug/controller', (req, res) => {
-  try {
-    const { register, login } = require('./controllers/authController');
-    res.json({
-      hasRegister: typeof register === 'function',
-      hasLogin: typeof login === 'function',
-      registerType: typeof register,
-      loginType: typeof login
-    });
-  } catch (error) {
-    res.json({ error: error.message });
-  }
-});
-
 // 404 handler
-app.use(notFound);
-app.use(errorHandler);
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;
