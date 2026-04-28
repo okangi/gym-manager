@@ -47,7 +47,12 @@ const { protect } = require(path.join(__dirname, 'middleware', 'authMiddleware')
 const { errorHandler, notFound } = require(path.join(__dirname, 'middleware', 'errorHandler'));
 
 // Use routes
-app.use('/api/auth', authRoutes);
+app.post('/api/auth/register', authRoutes.post('register'));
+app.post('/api/auth/login', authRoutes.post('login'));
+app.get('/api/auth/profile', authRoutes.get('profile'));
+app.put('/api/auth/profile', authRoutes.put('profile'));
+app.post('/api/auth/change-password', authRoutes.post('change-password'));
+// All other routes
 app.use('/api/branches', branchRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/plans', planRoutes);
