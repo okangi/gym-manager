@@ -143,6 +143,20 @@ app.get('/api/debug/auth-routes', (req, res) => {
   }
 });
 
+app.get('/api/debug/controller', (req, res) => {
+  try {
+    const { register, login } = require('./controllers/authController');
+    res.json({
+      hasRegister: typeof register === 'function',
+      hasLogin: typeof login === 'function',
+      registerType: typeof register,
+      loginType: typeof login
+    });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
 // 404 handler
 app.use(notFound);
 app.use(errorHandler);
