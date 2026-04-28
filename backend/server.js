@@ -3,113 +3,41 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+// Load environment variables
 dotenv.config();
+
 const app = express();
 
 // Import error handler middleware
 const { errorHandler, notFound } = require('./middleware/errorHandler');
+const { validateIdParam } = require('./utils/validateId');
 
-// Middleware FIRST
+// Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://gym-manager-frontend-agqh.onrender.com', 'http://localhost:3000', 'https://*.onrender.com'],
+  origin: ['http://localhost:5173', 'http://localhost:5174',  'https://gym-manager-frontend-agqh.onrender.com','http://localhost:3000', 'https://*.onrender.com'],
   credentials: true
 }));
+
+// Increase payload size limit for large uploads (base64 images, etc.)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.error('❌ MongoDB Error:', err));
-
-// ============ DIRECT AUTH ROUTES (WORKING) ============
-app.post('/api/auth/register', async (req, res) => {
+const connectDB = async () => {
   try {
-    const { name, email, password, role } = req.body;
-    const User = require('./models/User');
-    const bcrypt = require('bcryptjs');
-    const jwt = require('jsonwebtoken');
-    
-    if (!name || !email || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide name, email and password' });
-    }
-    
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ success: false, message: 'User already exists' });
-    }
-    
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role: role || 'member'
-    });
-    
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-    
-    res.status(201).json({
-      success: true,
-      token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role }
-    });
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error('Register error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error(`❌ MongoDB Error: ${error.message}`);
+    process.exit(1);
   }
-});
+};
 
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const User = require('./models/User');
-    const bcrypt = require('bcryptjs');
-    const jwt = require('jsonwebtoken');
-    
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
-    }
-    
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
-    }
-    
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-    
-    res.json({
-      success: true,
-      token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role }
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
+// Connect to MongoDB
+connectDB();
 
-app.get('/api/auth/profile', async (req, res) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ success: false, message: 'No token provided' });
-    }
-    const jwt = require('jsonwebtoken');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const User = require('./models/User');
-    const user = await User.findById(decoded.id).select('-password');
-    res.json({ success: true, user });
-  } catch (error) {
-    res.status(401).json({ success: false, message: 'Invalid token' });
-  }
-});
-// ============ END DIRECT AUTH ROUTES ============
-
-// ============ IMPORT ALL OTHER ROUTES ============
+// Import Routes
+const authRoutes = require('./routes/authRoutes');
 const branchRoutes = require('./routes/branchRoutes');
 const classRoutes = require('./routes/classRoutes');
 const planRoutes = require('./routes/planRoutes');
@@ -131,9 +59,12 @@ const chatRoutes = require('./routes/chatRoutes');
 const trainerRoutes = require('./routes/trainerRoutes');
 const membershipRoutes = require('./routes/membershipRoutes');
 const progressRoutes = require('./routes/progressRoutes');
+
+// Import middleware
 const { protect } = require('./middleware/authMiddleware');
 
-// Use all other routes (auth is already handled by direct routes above)
+// Use Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/plans', planRoutes);
@@ -162,18 +93,72 @@ app.get('/api/test', (req, res) => {
     success: true, 
     message: 'Gym Manager Backend is running!', 
     version: '1.0.0',
+    timestamp: new Date(),
     endpoints: {
-      auth: { register: 'POST /api/auth/register', login: 'POST /api/auth/login', profile: 'GET /api/auth/profile' },
-      branches: { getAll: 'GET /api/branches' },
-      classes: { getAll: 'GET /api/classes' },
-      payments: { getAll: 'GET /api/payments' },
-      attendance: { checkin: 'POST /api/attendance/checkin' },
-      users: { getAll: 'GET /api/users' }
+      auth: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login',
+        profile: 'GET /api/auth/profile'
+      },
+      branches: {
+        getAll: 'GET /api/branches',
+        getOne: 'GET /api/branches/:id',
+        create: 'POST /api/branches (Admin only)',
+        update: 'PUT /api/branches/:id (Admin only)',
+        delete: 'DELETE /api/branches/:id (Admin only)'
+      },
+      classes: {
+        getAll: 'GET /api/classes',
+        create: 'POST /api/classes (Trainer/Admin)',
+        update: 'PUT /api/classes/:id (Trainer/Admin)',
+        delete: 'DELETE /api/classes/:id (Admin only)'
+      },
+      membershipPlans: {
+        getAll: 'GET /api/plans',
+        getOne: 'GET /api/plans/:id',
+        create: 'POST /api/plans (Admin only)',
+        update: 'PUT /api/plans/:id (Admin only)',
+        delete: 'DELETE /api/plans/:id (Admin only)'
+      },
+      trainerPlans: {
+        getUserPlans: 'GET /api/plan-assignments/user/:userId',
+        getTrainerPlans: 'GET /api/plan-assignments/trainer/:trainerId',
+        create: 'POST /api/plan-assignments (Trainer only)',
+        update: 'PUT /api/plan-assignments/:id (Trainer only)',
+        delete: 'DELETE /api/plan-assignments/:id (Trainer only)'
+      },
+      payments: {
+        getAll: 'GET /api/payments',
+        getOne: 'GET /api/payments/:id',
+        create: 'POST /api/payments',
+        update: 'PUT /api/payments/:id (Admin only)'
+      },
+      attendance: {
+        checkin: 'POST /api/attendance/checkin',
+        checkout: 'PUT /api/attendance/checkout',
+        history: 'GET /api/attendance',
+        stats: 'GET /api/attendance/stats (Admin only)'
+      },
+      contact: {
+        send: 'POST /api/contact',
+        getAll: 'GET /api/contact (Admin only)',
+        getOne: 'GET /api/contact/:id (Admin only)',
+        update: 'PUT /api/contact/:id (Admin only)',
+        delete: 'DELETE /api/contact/:id (Admin only)'
+      },
+      bookings: {
+        create: 'POST /api/bookings',
+        getUserBookings: 'GET /api/bookings',
+        cancel: 'DELETE /api/bookings/:id'
+      },
+      users: {
+        getAll: 'GET /api/users'
+      }
     }
   });
 });
 
-// Get all users
+// Get all users (admin only in production)
 app.get('/api/users', async (req, res) => {
   try {
     const User = require('./models/User');
@@ -194,7 +179,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Change password endpoint
+// ============ CHANGE PASSWORD ENDPOINT ============
 app.post('/api/auth/change-password', protect, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -202,6 +187,7 @@ app.post('/api/auth/change-password', protect, async (req, res) => {
     const bcrypt = require('bcryptjs');
     
     const user = await User.findById(req.user.id);
+    
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
@@ -222,11 +208,17 @@ app.post('/api/auth/change-password', protect, async (req, res) => {
   }
 });
 
-// Email sending endpoint
+// Email sending endpoint (requires email configuration)
 app.post('/api/email/send', protect, async (req, res) => {
   try {
     const { to, subject, body } = req.body;
-    console.log('📧 EMAIL REQUEST:', { to, subject, body });
+    
+    // For now, just log the email (since email service may not be configured)
+    console.log('📧 EMAIL REQUEST:');
+    console.log(`   To: ${to}`);
+    console.log(`   Subject: ${subject}`);
+    console.log(`   Body: ${body}`);
+    
     res.json({ success: true, message: 'Email sent (simulated)' });
   } catch (error) {
     console.error('Email error:', error);
@@ -235,22 +227,45 @@ app.post('/api/email/send', protect, async (req, res) => {
 });
 
 // ============ ERROR HANDLING MIDDLEWARE ============
+// These must be the LAST middleware added
+
+// 404 handler for undefined routes
 app.use(notFound);
+
+// Global error handler
 app.use(errorHandler);
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0',  () => {
   console.log(`
 ╔══════════════════════════════════════════════════════════╗
+║                                                          ║
 ║     🏋️‍♂️ GYM MANAGER BACKEND - SERVER STARTED 🏋️‍♂️         ║
-║  ✅ Server running on: http://0.0.0.0:${PORT}            ║
+║                                                          ║
+╠══════════════════════════════════════════════════════════╣
+║  ✅ Server running on: http://localhost:${PORT}          ║
 ║  ✅ MongoDB: Connected                                   ║
-║  🔐 Auth: /api/auth (register, login, profile)          ║
+║  📝 Test API: http://localhost:${PORT}/api/test          ║
+║  ❤️  Health: http://localhost:${PORT}/api/health         ║
+╠══════════════════════════════════════════════════════════╣
+║  📚 AVAILABLE ENDPOINTS:                                 ║
+║  🔐 Auth:      /api/auth                                 ║
+║  🏢 Branches:  /api/branches                             ║
+║  📚 Classes:   /api/classes                              ║
+║  📋 Membership Plans: /api/plans (Admin only for write)  ║
+║  📋 Trainer Plans: /api/plan-assignments (Trainer only)  ║
+║  💰 Payments:  /api/payments                             ║
+║  ✅ Attendance:/api/attendance                           ║
+║  📧 Contact:   /api/contact                              ║
+║  📅 Bookings:  /api/bookings                             ║
+║  👥 Users:     /api/users                                ║
+║  🔑 Change PW: POST /api/auth/change-password            ║
 ╚══════════════════════════════════════════════════════════╝
   `);
 });
 
-process.on('unhandledRejection', (err) => {
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err, promise) => {
   console.log(`❌ Unhandled Rejection: ${err.message}`);
 });
