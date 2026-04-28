@@ -5,7 +5,6 @@
     rootDir: backend
     buildCommand: npm install
     startCommand: node server.js
-    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -26,10 +25,10 @@
     rootDir: frontend
     buildCommand: npm install && npm run build
     publishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
-    envVars:
-      - key: VITE_API_URL
-        value: https://gym-backend.onrender.com
