@@ -19,7 +19,7 @@
       - key: CLOUDINARY_API_SECRET
         sync: false
 
-  - type: static
+  - type: web
     name: gym-frontend
     runtime: static
     rootDir: frontend
