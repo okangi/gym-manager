@@ -1,8 +1,8 @@
 ﻿services:
+  # Backend API - Node.js web service (Free Tier)
   - type: web
     name: gym-backend
     runtime: node
-    plan: free    
     rootDir: backend
     buildCommand: npm install
     startCommand: node server.js
@@ -20,10 +20,10 @@
       - key: CLOUDINARY_API_SECRET
         sync: false
 
+  # Frontend - Static site (Always free)
   - type: web
     name: gym-frontend
     runtime: static
-    plan: free 
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
