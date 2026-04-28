@@ -114,6 +114,35 @@ app.post('/api/auth/change-password', protect, async (req, res) => {
   }
 });
 
+// Debug: Check what's in authRoutes
+app.get('/api/debug/auth-routes', (req, res) => {
+  try {
+    const authRoutesModule = require('./routes/authRoutes');
+    const routes = [];
+    
+    // Check if authRoutes has a stack property (express router)
+    if (authRoutesModule && authRoutesModule.stack) {
+      authRoutesModule.stack.forEach((layer) => {
+        if (layer.route) {
+          routes.push({
+            path: layer.route.path,
+            methods: Object.keys(layer.route.methods)
+          });
+        }
+      });
+    }
+    
+    res.json({
+      authRoutesType: typeof authRoutesModule,
+      isExpressRouter: typeof authRoutesModule === 'function',
+      routes: routes,
+      hasStack: !!authRoutesModule?.stack
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // 404 handler
 app.use(notFound);
 app.use(errorHandler);
