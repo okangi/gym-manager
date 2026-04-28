@@ -36,7 +36,107 @@ const connectDB = async () => {
 // Connect to MongoDB
 connectDB();
 
-// Import Routes
+// ============ TEMPORARY DIRECT AUTH ROUTES ============
+// This will make your app work while we debug the file loading issue
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    const User = require('./models/User');
+    const bcrypt = require('bcryptjs');
+    const jwt = require('jsonwebtoken');
+    
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Please provide name, email and password' });
+    }
+    
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ success: false, message: 'User already exists' });
+    }
+    
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: role || 'member'
+    });
+    
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    
+    res.status(201).json({
+      success: true,
+      token,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role }
+    });
+  } catch (error) {
+    console.error('Register error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const User = require('./models/User');
+    const bcrypt = require('bcryptjs');
+    const jwt = require('jsonwebtoken');
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+    
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+    
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    
+    res.json({
+      success: true,
+      token,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+console.log('✅ Temporary direct auth routes added');
+// ============ END TEMPORARY DIRECT AUTH ROUTES ============
+
+// Import Routes with Debug
+console.log('=== DEBUG: Starting route imports ===');
+console.log('Current directory:', __dirname);
+const fs = require('fs');
+
+// Check routes folder
+console.log('Routes folder exists?', fs.existsSync('./routes'));
+if (fs.existsSync('./routes')) {
+  console.log('Files in routes folder:', fs.readdirSync('./routes'));
+}
+
+// Check authRoutes file specifically
+console.log('authRoutes.js exists?', fs.existsSync('./routes/authRoutes.js'));
+try {
+  console.log('authRoutes.js size:', fs.statSync('./routes/authRoutes.js').size + ' bytes');
+} catch(e) { console.log('Cannot stat authRoutes.js'); }
+
+// Try to require authRoutes
+try {
+  const testAuthRoutes = require('./routes/authRoutes');
+  console.log('✅ authRoutes loaded successfully!');
+  console.log('authRoutes type:', typeof testAuthRoutes);
+  console.log('authRoutes has post?', typeof testAuthRoutes.post === 'function');
+} catch (error) {
+  console.error('❌ ERROR loading authRoutes:', error.message);
+}
+
+// Load all routes
 const authRoutes = require('./routes/authRoutes');
 const branchRoutes = require('./routes/branchRoutes');
 const classRoutes = require('./routes/classRoutes');
@@ -60,11 +160,12 @@ const trainerRoutes = require('./routes/trainerRoutes');
 const membershipRoutes = require('./routes/membershipRoutes');
 const progressRoutes = require('./routes/progressRoutes');
 
+console.log('=== DEBUG: All routes imported ===');
+
 // Import middleware
 const { protect } = require('./middleware/authMiddleware');
 
-// Use Routes
-app.use('/api/auth', authRoutes);
+// Use Routes (Note: auth routes are already handled by direct routes above)
 app.use('/api/branches', branchRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/plans', planRoutes);
@@ -244,7 +345,7 @@ app.listen(PORT, '0.0.0.0',  () => {
 ║     🏋️‍♂️ GYM MANAGER BACKEND - SERVER STARTED 🏋️‍♂️         ║
 ║                                                          ║
 ╠══════════════════════════════════════════════════════════╣
-║  ✅ Server running on: http://localhost:${PORT}          ║
+║  ✅ Server running on: http://0.0.0.0:${PORT}            ║
 ║  ✅ MongoDB: Connected                                   ║
 ║  📝 Test API: http://localhost:${PORT}/api/test          ║
 ║  ❤️  Health: http://localhost:${PORT}/api/health         ║
